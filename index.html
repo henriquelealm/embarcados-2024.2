@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Avançado do Microondas</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset Básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Estilos Globais */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0B132B, #1C2541);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #E0FBFC;
+            overflow: hidden;
+        }
+
+        /* Container Principal */
+        .container {
+            background: #1C2541;
+            padding: 40px 50px;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 90%;
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 30px;
+            position: relative;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Animação de Entrada */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cabeçalho */
+        .header {
+            text-align: center;
+            animation: slideDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #E0FBFC;
+        }
+
+        .header h1 i {
+            color: #F4D35E;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Controles */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .controls .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .controls .input-group label {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #F4D35E;
+        }
+
+        .controls .input-group input {
+            width: 100px;
+            padding: 10px;
+            border: 2px solid #415A77;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #2C3E50;
+            color: #E0FBFC;
+        }
+
+        .controls .input-group input:focus {
+            outline: none;
+            border-color: #F4D35E;
+            box-shadow: 0 0 10px rgba(244, 211, 94, 0.7);
+        }
+
+        /* Botões */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, #415A77, #778DA9);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.7);
+        }
+
+        .btn-stop {
+            background: linear-gradient(45deg, #778DA9, #415A77);
+        }
+
+        .btn-stop:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.7);
+        }
+
+        .btn i {
+            margin-right: 8px;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Status */
+        .status {
+            text-align: center;
+            font-size: 1.2em;
+            padding: 10px;
+            border-radius: 12px;
+            transition: background 0.3s, color 0.3s;
+            background: #2C3E50;
+            color: #E0FBFC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 50px;
+        }
+
+        .status.success {
+            background: #28a745;
+            color: #FFFFFF;
+        }
+
+        .status.error {
+            background: #dc3545;
+            color: #FFFFFF;
+        }
+
+        .status i {
+            font-size: 1.2em;
+        }
+
+        /* Barra de Progresso */
+        .progress-container {
+            margin-top: 25px;
+            background: #2C3E50;
+            border-radius: 15px;
+            overflow: hidden;
+            height: 25px;
+            position: relative;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #F4D35E;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, rgba(244, 211, 94, 0.2), rgba(244, 211, 94, 0));
+            pointer-events: none;
+        }
+
+        /* Logs */
+        .logs {
+            background: rgba(44, 58, 121, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.5);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .logs h2 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #F4D35E;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logs h2 i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .logs .log-entry {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #F4D35E;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .logs .log-entry:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .logs .log-entry p {
+            margin: 0;
+            font-size: 0.95em;
+            color: #E0FBFC;
+        }
+
+        .logs .log-entry .timestamp {
+            font-weight: 600;
+            color: #F4D35E;
+        }
+
+        /* Scrollbar Customizada */
+        .logs::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .logs::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .logs::-webkit-scrollbar-thumb {
+            background: #F4D35E;
+            border-radius: 10px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .controls .input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .controls .input-group label {
+                font-size: 1em;
+            }
+
+            .controls .input-group input {
+                width: 80%;
+                padding: 8px;
+            }
+
+            .btn {
+                font-size: 1em;
+                padding: 12px;
+            }
+
+            .logs h2 {
+                font-size: 1.2em;
+            }
+
+            .logs .log-entry p {
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1><i class="fas fa-microwave"></i> Controle do Microondas</h1>
+        </div>
+
+        <!-- Controles -->
+        <div class="controls">
+            <!-- Campo para definir o tempo de cozimento -->
+            <div class="input-group">
+                <label for="tempo">Tempo (s):</label>
+                <input type="number" id="tempo" min="1" max="3600" value="30">
+            </div>
+            <!-- Botão para iniciar o micro-ondas -->
+            <button class="btn btn-start" onclick="ligarMicroondas()">
+                <i class="fas fa-play"></i> Iniciar
+            </button>
+            <!-- Botão para parar o micro-ondas -->
+            <button class="btn btn-stop" onclick="desligarMicroondas()">
+                <i class="fas fa-stop"></i> Parar
+            </button>
+        </div>
+
+        <!-- Barra de Progresso -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Status -->
+        <div class="status" id="status">
+            <i class="fas fa-circle-notch fa-spin"></i> Aguardando comandos...
+        </div>
+
+        <!-- Logs -->
+        <div class="logs">
+            <h2><i class="fas fa-stream"></i> Logs Recentes</h2>
+            <div id="logEntries">
+                <!-- Logs serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        // Configurações do Firebase
+        const FIREBASE_HOST = "https://microondas-6fb47-default-rtdb.firebaseio.com"; // Substitua pela URL correta do seu Firebase Realtime Database
+        const FIREBASE_AUTH = "6zoAU2v5ja6lp3cNFYunrBFAaX1EVY9CnNWec25O"; // Substitua pelo seu token de autenticação
+
+        // Função para exibir mensagens de status
+        function exibirStatus(mensagem, tipo) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = mensagem;
+            statusDiv.classList.remove('success', 'error');
+
+            // Adicionar ícone de status
+            if(tipo === 'success') {
+                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ' + mensagem;
+            } else if(tipo === 'error') {
+                statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> ' + mensagem;
+            } else {
+                statusDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> ' + mensagem;
+            }
+
+            // Remover a mensagem após 5 segundos
+            setTimeout(() => {
+                statusDiv.textContent = 'Aguardando comandos...';
+                statusDiv.className = 'status';
+                statusDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Aguardando comandos...';
+            }, 5000);
+        }
+
+        // Função para adicionar logs
+        function adicionarLog(mensagem, timestamp) {
+            const logDiv = document.getElementById('logEntries');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `<p><span class="timestamp">[${new Date(timestamp).toLocaleTimeString()}]</span> ${mensagem}</p>`;
+            logDiv.prepend(logEntry);
+        }
+
+        // Função para atualizar a barra de progresso
+        function atualizarProgresso(percent) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percent + '%';
+        }
+
+        // Função para ligar o micro-ondas
+        async function ligarMicroondas() {
+            const tempoInput = document.getElementById('tempo');
+            const tempo = parseInt(tempoInput.value);
+            if(isNaN(tempo) || tempo <= 0){
+                exibirStatus("Por favor, insira um tempo válido.", "error");
+                return;
+            }
+
+            const url = `${FIREBASE_HOST}/microondas.json?auth=${FIREBASE_AUTH}`;
+            const data = {
+                device: {
+                    status: "disponivel",
+                    command: "START",
+                    time: tempo
+                }
+            };
+
+            try {
+                exibirStatus("Iniciando o micro-ondas...", ""); // Status inicial
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    exibirStatus("Micro-ondas iniciado com sucesso!", "success");
+                } else {
+                    const erro = await response.text();
+                    throw new Error(`Erro ${response.status}: ${erro}`);
+                }
+            } catch (error) {
+                exibirStatus(`Falha ao iniciar o micro-ondas: ${error.message}`, "error");
+            }
+        }
+
+        // Função para desligar o micro-ondas
+        async function desligarMicroondas() {
+            const url = `${FIREBASE_HOST}/microondas.json?auth=${FIREBASE_AUTH}`;
+            const data = {
+                device: {
+                    command: "STOP",
+                    time: 0
+                }
+            };
+
+            try {
+                exibirStatus("Parando o micro-ondas...", ""); // Status inicial
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    exibirStatus("Micro-ondas parado com sucesso!", "success");
+                    atualizarProgresso(0);
+                } else {
+                    const erro = await response.text();
+                    throw new Error(`Erro ${response.status}: ${erro}`);
+                }
+            } catch (error) {
+                exibirStatus(`Falha ao parar o micro-ondas: ${error.message}`, "error");
+            }
+        }
+
+        // Função para monitorar o progresso (simulado)
+        function monitorarProgresso(duracao) {
+            let tempoRestante = duracao;
+            const intervalo = setInterval(() => {
+                if (tempoRestante >= 0) {
+                    const percent = ((duracao - tempoRestante) / duracao) * 100;
+                    atualizarProgresso(percent);
+                    tempoRestante--;
+                } else {
+                    clearInterval(intervalo);
+                    exibirStatus("Ciclo de cozimento concluído!", "success");
+                }
+            }, 1000);
+        }
+
+        // Função para buscar e exibir logs
+        async function buscarLogs() {
+            const url = `${FIREBASE_HOST}/logs.json?auth=${FIREBASE_AUTH}&orderBy="timestamp"&limitToLast=20`;
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const logs = await response.json();
+                    const logEntries = document.getElementById('logEntries');
+                    logEntries.innerHTML = ''; // Limpar logs atuais
+                    if(logs){
+                        // Converter objetos em array e ordenar por timestamp descendente
+                        const logsArray = Object.values(logs).sort((a, b) => b.timestamp - a.timestamp);
+                        logsArray.forEach(log => {
+                            adicionarLog(log.message, log.timestamp);
+                        });
+                    } else {
+                        logEntries.innerHTML = '<p>Nenhum log disponível.</p>';
+                    }
+                } else {
+                    console.error(`Erro ao buscar logs: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error(`Erro ao buscar logs: ${error.message}`);
+            }
+        }
+
+        // Atualizar logs a cada 5 segundos
+        setInterval(buscarLogs, 5000);
+
+        // Inicializar logs ao carregar a página
+        window.onload = () => {
+            buscarLogs();
+        };
+    </script>
+</body>
+</html>
